@@ -19,7 +19,7 @@ cd chstu-lab-main
 
 %install
 mkdir -p %{buildroot}/usr/bin
-install -m 755 %{_builddir}/chstu-lab/count-files.sh %{buildroot}/usr/bin/count-files
+install -m 755 %{_builddir}/chstu-lab-main/count-files.sh %{buildroot}/usr/bin/count-files
 
 %files
 /usr/bin/count-files
