@@ -15,7 +15,7 @@ count-files.sh is a simple script that calculates the number of files in a direc
 
 %prep
 unzip %SOURCE0
-cd chstu-lab
+cd chstu-lab-main
 
 %install
 mkdir -p %{buildroot}/usr/bin
