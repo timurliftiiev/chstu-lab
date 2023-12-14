@@ -1,0 +1,44 @@
+# This is a basic workflow to help you get started with Actions
+
+name: deb
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    container:
+      image: ubuntu:latest
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build deb
+        run: |
+          mkdir -p ~/debbuild/DEBIAN
+          cp debian/control ~/debbuild/DEBIAN/
+          mkdir -p ~/debbuild/usr/bin
+          cp count-files.sh ~/debbuild/usr/bin/count-files
+          chmod +x ~/debbuild/usr/bin/count-files
+          dpkg-deb --build ~/debbuild
+
+      - name: Upload DEB
+        uses: actions/upload-artifact@v2
+        with:
+          name: deb-package
+          path: |
+            ~/*.deb
