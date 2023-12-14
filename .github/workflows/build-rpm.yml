@@ -1,0 +1,51 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    
+    container:
+      image: centos:7
+      
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      - name: Install RPM build tools
+        run: |
+          yum install -y rpm-build rpmdevtools wget unzip
+          rpmdev-setuptree
+
+      - name: Build RPM
+        run: |
+          cp rpm/count-files.spec ~/rpmbuild/SPECS/
+          cd ~/rpmbuild/SOURCES/
+          wget https://github.com/timurliftiiev/chstu-lab/archive/main.zip
+          cd ../../
+          rpmbuild -bs --define "dist .generic" rpmbuild/SPECS/count-files.spec
+          rpmbuild --rebuild rpmbuild/SRPMS/count-files-1.0-1.generic.src.rpm
+
+      - name: Upload RPM
+        uses: actions/upload-artifact@v2
+        with:
+          name: rpm-package
+          path: |
+            ~/rpmbuild/RPMS/**/*.rpm
+            ~/rpmbuild/SRPMS/**/*.src.rpm
